@@ -57,10 +57,14 @@ async function detectBanners() {
     const pcUrl = await findFile(PC_BASE, i);
     if (!pcUrl) return null; // 해당 번호 없으면 스킵 (중간 공백 허용)
     const mobileUrl = await findFile(MOBILE_BASE, i) || '';
+    // BANNER_LINKS[i-1] 에 링크가 있으면 사용, 없으면 '#'
+    const link = (typeof BANNER_LINKS !== 'undefined' && BANNER_LINKS[i - 1])
+      ? BANNER_LINKS[i - 1]
+      : '#';
     return {
       imageUrl:       pcUrl,
       mobileImageUrl: mobileUrl,
-      linkUrl:        '#',
+      linkUrl:        link,
       memo:           `배너 ${i}`,
     };
   });
