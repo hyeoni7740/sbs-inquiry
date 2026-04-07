@@ -4,7 +4,7 @@
    ============================================================ */
 
 // ── Google Apps Script Web App URL을 여기에 입력하세요 ──
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxFMCO087JcFe9TswqB2ZXhBkyS23TwvbN7ED2yKaLd_GI7smZ3IAsGuniktIHjUWv6DA/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwIxsWd49JIaxUoSlL6Vi3LSUWYX9Rz_566lJOUWq9A9Vp1lk7XPfdMOUrLLL3vN4PUqQ/exec";
 
 const form       = document.getElementById('inquiry-form');
 const btn        = document.getElementById('submit-btn');
