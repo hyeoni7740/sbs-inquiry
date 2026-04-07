@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SBS 아카데미 게임학원 · 노원지점</title>
+  <title>SBS 아카데미 게임학원 · 수강료 조회 및 문의</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,8 +33,8 @@
     </div>
 
     <div class="live-badge">접수 중</div>
-    <h1>노원지점 문의</h1>
-    <p class="subtitle">Nowon Branch · Inquiry Form</p>
+    <h1>수강료 조회 및 문의</h1>
+    <p class="subtitle">Inquiry & Tuition · SBS Academy Game School</p>
 
     <div class="phone-pill">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
@@ -57,6 +57,33 @@
 
     <!-- ── 기본 정보 ── -->
     <div class="card">
+      <!-- 지점 선택 (전체 너비) -->
+      <div class="field field--full">
+        <label>지점 <span class="req">*</span></label>
+        <div class="select-wrap">
+          <select id="branch" name="branch" class="placeholder-active">
+            <option value="">지점을 선택해주세요</option>
+            <option value="노원">노원</option>
+            <option value="강남/신논현">강남/신논현</option>
+            <option value="신촌/홍대">신촌/홍대</option>
+            <option value="인천">인천</option>
+            <option value="수원/동탄">수원/동탄</option>
+            <option value="분당">분당</option>
+            <option value="일산">일산</option>
+            <option value="안산">안산</option>
+            <option value="안양">안양</option>
+            <option value="부산">부산</option>
+            <option value="대구">대구</option>
+            <option value="울산">울산</option>
+            <option value="대전">대전</option>
+            <option value="천안/아산">천안/아산</option>
+            <option value="광주">광주</option>
+            <option value="청주">청주</option>
+          </select>
+        </div>
+        <span class="field-error" id="err-branch">지점을 선택해주세요</span>
+      </div>
+
       <div class="form-grid">
         <div class="field">
           <label>성함 <span class="req">*</span></label>

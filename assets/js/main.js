@@ -50,7 +50,7 @@ function hideError(id, inputId) {
 });
 
 /* 드롭다운 선택 시 에러 해제 + placeholder 색상 전환 */
-['age', 'purpose'].forEach(id => {
+['age', 'purpose', 'branch'].forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('change', () => {
     hideError('err-' + id, id);
@@ -74,6 +74,10 @@ function validate() {
   // 연락처: 010-XXXX-XXXX (총 13자)
   const phone = document.getElementById('phone').value.trim();
   if (!/^010-\d{4}-\d{4}$/.test(phone)) { showError('err-phone', 'phone'); ok = false; }
+
+  // 지점
+  const branch = document.getElementById('branch').value.trim();
+  if (!branch) { showError('err-branch', 'branch'); ok = false; }
 
   // 나이
   const age = document.getElementById('age').value.trim();
@@ -113,6 +117,7 @@ form.addEventListener('submit', async (e) => {
   // 데이터 수집
   const name    = document.getElementById('name').value.trim();
   const phone   = document.getElementById('phone').value.trim();
+  const branch  = document.getElementById('branch').value.trim();
   const age     = document.getElementById('age').value.trim();
   const purpose = document.getElementById('purpose').value.trim();
 
@@ -123,7 +128,7 @@ form.addEventListener('submit', async (e) => {
   }
   const courses   = courseVals.join(', ');
   const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const payload   = { timestamp, name, phone, age, purpose, courses };
+  const payload   = { timestamp, name, phone, branch, age, purpose, courses };
 
   try {
     if (SHEET_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL") {
@@ -144,7 +149,7 @@ form.addEventListener('submit', async (e) => {
     form.reset();
     document.getElementById('consent-card').classList.remove('agreed');
     // 드롭다운 초기화 후 placeholder 스타일 복원
-    ['age', 'purpose'].forEach(id => {
+    ['branch', 'age', 'purpose'].forEach(id => {
       document.getElementById(id).classList.add('placeholder-active');
     });
   } catch (err) {

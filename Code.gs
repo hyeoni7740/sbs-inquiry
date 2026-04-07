@@ -17,8 +17,8 @@ function doPost(e) {
     // 시트가 없으면 자동 생성 + 헤더 추가
     if (!sheet) {
       sheet = ss.insertSheet(SHEET_NAME);
-      sheet.appendRow(["접수시각", "성함", "연락처", "나이", "수강목적", "문의과목"]);
-      sheet.getRange(1, 1, 1, 6).setFontWeight("bold").setBackground("#1a1a2e").setFontColor("#00d4ff");
+      sheet.appendRow(["접수시각", "성함", "연락처", "나이", "수강목적", "지점", "문의과목"]);
+      sheet.getRange(1, 1, 1, 7).setFontWeight("bold").setBackground("#1a1a2e").setFontColor("#00d4ff");
       sheet.setFrozenRows(1);
     }
 
@@ -28,6 +28,7 @@ function doPost(e) {
       data.phone    || "",
       data.age      || "",
       data.purpose  || "",
+      data.branch   || "",
       data.courses  || "",
     ]);
 
