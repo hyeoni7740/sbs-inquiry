@@ -43,6 +43,9 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  /* 한국어 단어 단위 줄바꿈 (음절 단위 강제 분리 방지) */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 격자 배경 */
@@ -198,7 +201,7 @@ h1 {
   margin-bottom: 22px;
 }
 
-/* ── 전화번호 알약 ── */
+/* ── 전화번호 알약 (<a> 태그로 탭투콜 지원, 브라우저 기본 링크 스타일 제거) ── */
 .phone-pill {
   display: inline-flex;
   align-items: center;
@@ -214,6 +217,15 @@ h1 {
   letter-spacing: 0.08em;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
   transition: box-shadow 0.3s, border-color 0.3s;
+  /* <a> 태그 기본 스타일 제거 */
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.phone-pill:hover,
+.phone-pill:visited,
+.phone-pill:active {
+  color: var(--accent);
+  text-decoration: none;
 }
 .phone-pill:hover {
   box-shadow: 0 0 32px rgba(56, 189, 248, 0.3);
@@ -816,10 +828,69 @@ select.error-field {
   filter: brightness(1.06);
 }
 
-/* 모바일: 750×400 이미지 기준 (표시 375×200) */
-@media (max-width: 500px) {
+/* ── 모바일 전체 레이아웃 (max-width: 540px) ── */
+@media (max-width: 540px) {
+
+  /* 래퍼 패딩 축소 */
+  .wrapper {
+    padding: 36px 16px 64px;
+  }
+
+  /* 헤더 간격 축소 */
+  header {
+    margin-bottom: 32px;
+  }
+
+  /* 타이틀 크기 조정 */
+  h1 {
+    font-size: clamp(36px, 11vw, 52px);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  /* 영어 자막 모바일에서 숨김 */
+  .subtitle {
+    display: none;
+  }
+
+  /* 전화번호 폰트 축소 */
+  .phone-pill {
+    font-size: 15px;
+    padding: 10px 20px;
+  }
+
+  /* 배너: 이미지 비율 유지하며 전체 표시 (잘림 없음) */
   .banner-img {
-    height: 200px;
+    height: auto;
+    max-height: 360px;
+    object-fit: contain;
+    background: var(--surface2);
+  }
+
+  /* 텍스트 배너 높이 축소 */
+  .banner-slide--text a {
+    min-height: 90px;
+  }
+
+  /* 카드 패딩 축소 */
+  .card {
+    padding: 24px 18px;
+  }
+
+  /* 개인정보 동의 카드 패딩 축소 */
+  .consent-card {
+    padding: 18px 16px;
+  }
+
+  /* 동의 텍스트 줄바꿈 방지 */
+  .consent-text {
+    font-size: 12px;
+  }
+
+  /* 동의 본문 텍스트 축소 */
+  .consent-body p {
+    font-size: 11px;
+    line-height: 1.8;
   }
 }
 

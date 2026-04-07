@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- 모바일 브라우저의 전화번호 자동 링크 변환 방지 -->
+  <meta name="format-detection" content="telephone=no"/>
   <title>SBS 아카데미 게임학원 · 수강료 조회 및 문의</title>
 
   <!-- Google Fonts -->
@@ -33,15 +35,16 @@
     </div>
 
     <div class="live-badge">접수 중</div>
-    <h1>수강료 조회 및 문의</h1>
-    <p class="subtitle">Inquiry & Tuition · SBS Academy Game School</p>
+    <h1>수강료<br>조회 및 문의</h1>
+    <p class="subtitle">SBS Academy Game School</p>
 
-    <div class="phone-pill">
+    <!-- tel 링크로 모바일 탭투콜 지원 + CSS로 스타일 직접 제어 -->
+    <a href="tel:02-6229-7740" class="phone-pill">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.3 2 2 0 0 1 3.6 1.1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
       02-6229-7740
-    </div>
+    </a>
     <p class="hours">주말 · 공휴일 상담 및 접수 가능합니다</p>
   </header>
 
