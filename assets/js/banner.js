@@ -18,6 +18,40 @@ let currentIndex = 0;
 let totalSlides  = 0;
 let isPaused     = false; // 사용자가 수동으로 일시정지한 상태
 
+// ── 배너 데이터 로드 (localStorage 캐시 우선) ─────────
+const CACHE_KEY = 'sbs_banners';
+const CACHE_TTL = 10 * 60 * 1000; // 10분
+
+async function loadBanners() {
+  // 1) 캐시 확인 → 유효하면 즉시 반환 (빠름)
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached.ts < CACHE_TTL && cached.data.length > 0) {
+      // 백그라운드에서 조용히 갱신 (다음 방문에 반영)
+      fetchAndCache().catch(() => {});
+      return cached.data;
+    }
+  } catch (_) {}
+
+  // 2) 캐시 없거나 만료 → API 직접 호출
+  return fetchAndCache();
+}
+
+async function fetchAndCache() {
+  try {
+    const res  = await fetch(SHEET_URL, { method: 'GET' });
+    const data = await res.json();
+    const list = Array.isArray(data.banners) ? data.banners : [];
+    if (list.length > 0) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: list }));
+    }
+    return list;
+  } catch (err) {
+    console.error('[banner] 배너 로드 실패:', err);
+    return [];
+  }
+}
+
 // ── Google Drive URL 변환 ─────────────────────────────
 // 공유 링크 형식: https://drive.google.com/file/d/파일ID/view?...
 // → thumbnail URL: https://drive.google.com/thumbnail?id=파일ID&sz=w1200
@@ -37,15 +71,7 @@ async function initBannerSlider() {
   let isDemo  = false;
 
   if (typeof SHEET_URL !== 'undefined' && SHEET_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL') {
-    try {
-      const res  = await fetch(SHEET_URL, { method: 'GET' });
-      const data = await res.json();
-      if (Array.isArray(data.banners) && data.banners.length > 0) {
-        banners = data.banners;
-      }
-    } catch (err) {
-      console.error('[banner] 배너 로드 실패:', err);
-    }
+    banners = await loadBanners();
   }
 
   if (banners.length === 0) {

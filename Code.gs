@@ -36,6 +36,9 @@ function doPost(e) {
     const lastRow = sheet.getLastRow();
     sheet.getRange(lastRow, 1, 1, 7).setHorizontalAlignment("center");
 
+    // 새 문의 접수 시 이메일 알림 발송
+    sendNotificationEmail(data);
+
     return buildJsonResponse({ status: "success" });
 
   } catch (err) {
@@ -72,6 +75,34 @@ function doGet(e) {
 
   } catch (err) {
     return buildJsonResponse({ banners: [], error: err.message });
+  }
+}
+
+// ── 문의 접수 알림 이메일 발송 ────────────────────────
+// 알림 받을 이메일 주소를 아래에 입력하세요
+const NOTIFY_EMAIL = "hyeon76666166@gmail.com";
+
+function sendNotificationEmail(data) {
+  try {
+    const subject = `[SBS 아카데미] 새 문의 접수 - ${data.name || "이름없음"} (${data.branch || ""})`;
+    const body = [
+      "새로운 문의가 접수되었습니다.",
+      "",
+      `접수시각: ${data.timestamp || ""}`,
+      `성함:     ${data.name    || ""}`,
+      `연락처:   ${data.phone   || ""}`,
+      `나이:     ${data.age     || ""}`,
+      `수강목적: ${data.purpose || ""}`,
+      `희망지점: ${data.branch  || ""}`,
+      `문의과목: ${data.courses || ""}`,
+      "",
+      "▶ 스프레드시트 바로가기",
+      SpreadsheetApp.getActiveSpreadsheet().getUrl(),
+    ].join("\n");
+
+    MailApp.sendEmail(NOTIFY_EMAIL, subject, body);
+  } catch (err) {
+    // 이메일 발송 실패해도 문의 접수는 정상 처리
   }
 }
 
