@@ -51,9 +51,11 @@ async function findFile(basePath, index) {
 }
 
 // ── 배너 목록 자동 감지 (번호 중간 공백 허용) ──────────
-// 모든 번호를 병렬로 확인 → 존재하는 것만 번호 오름차순으로 표시
+// BANNER_COUNT까지만 병렬 확인 → 존재하는 것만 번호 오름차순으로 표시
 async function detectBanners() {
-  const checks = Array.from({ length: MAX_BANNERS }, (_, i) => i + 1).map(async (i) => {
+  // banner-links.js의 BANNER_COUNT 우선, 없으면 MAX_BANNERS 사용
+  const count = (typeof BANNER_COUNT !== 'undefined') ? BANNER_COUNT : MAX_BANNERS;
+  const checks = Array.from({ length: count }, (_, i) => i + 1).map(async (i) => {
     const pcUrl = await findFile(PC_BASE, i);
     if (!pcUrl) return null; // 해당 번호 없으면 스킵 (중간 공백 허용)
     const mobileUrl = await findFile(MOBILE_BASE, i) || '';
