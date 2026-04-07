@@ -80,7 +80,7 @@ function doGet(e) {
 
 // ── 문의 접수 알림 이메일 발송 ────────────────────────
 // 알림 받을 이메일 주소를 아래에 입력하세요
-const NOTIFY_EMAIL = "hyeon76666166@gmail.com";
+const NOTIFY_EMAIL = "hyeon_6166@naver.com";
 
 function sendNotificationEmail(data) {
   try {
@@ -104,6 +104,13 @@ function sendNotificationEmail(data) {
   } catch (err) {
     // 이메일 발송 실패해도 문의 접수는 정상 처리
   }
+}
+
+// ── 워밍업 함수 (트리거로 5분마다 실행 → 콜드 스타트 방지) ──
+// Apps Script 편집기 → 왼쪽 시계 아이콘(트리거) → 트리거 추가
+// 함수: warmup / 이벤트: 시간 기반 / 5분마다
+function warmup() {
+  SpreadsheetApp.getActiveSpreadsheet(); // 스프레드시트 접속으로 서버 유지
 }
 
 // ── 공통: JSON 응답 빌더 ──────────────────────────────
