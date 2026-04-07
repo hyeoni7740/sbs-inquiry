@@ -105,7 +105,7 @@ form.addEventListener('submit', async (e) => {
   if (isSubmitting) return;
 
   // 허니팟 필드가 채워져 있으면 봇으로 간주 → 조용히 차단
-  if (document.getElementById('hp_check').value) return;
+  if (document.getElementById('hp_check')?.value) return;
 
   // 마지막 제출로부터 30초 미경과 시 차단
   const lastSubmit = Number(localStorage.getItem('sbs_last_submit') || 0);
@@ -141,7 +141,7 @@ form.addEventListener('submit', async (e) => {
   const courses   = courseVals.join(', ');
   const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
   const payload   = { timestamp, name, phone, branch, age, purpose, courses,
-                      hp_check: document.getElementById('hp_check').value };
+                      hp_check: document.getElementById('hp_check')?.value || '' };
 
   try {
     if (SHEET_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL") {
