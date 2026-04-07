@@ -182,9 +182,11 @@ header {
 /* ── 제목 ── */
 h1 {
   font-family: "Bebas Neue", sans-serif;
-  font-size: clamp(44px, 9vw, 66px);
+  /* 화면 너비에 비례해 자동 축소 → 모바일에서도 한 줄 유지 */
+  font-size: clamp(22px, 6.2vw, 66px);
   letter-spacing: 0.04em;
   line-height: 1;
+  white-space: nowrap;
   margin-bottom: 10px;
   background: linear-gradient(120deg, #f0f6ff 20%, #38bdf8 60%, #818cf8 100%);
   -webkit-background-clip: text;
@@ -217,15 +219,19 @@ h1 {
   letter-spacing: 0.08em;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
   transition: box-shadow 0.3s, border-color 0.3s;
-  /* <a> 태그 기본 스타일 제거 */
-  text-decoration: none;
+  /* <a> 태그 기본 스타일 강제 제거 (모바일 브라우저 포함) */
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
   -webkit-tap-highlight-color: transparent;
 }
-.phone-pill:hover,
+.phone-pill:link,
 .phone-pill:visited,
-.phone-pill:active {
-  color: var(--accent);
-  text-decoration: none;
+.phone-pill:hover,
+.phone-pill:active,
+.phone-pill:focus {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;
 }
 .phone-pill:hover {
   box-shadow: 0 0 32px rgba(56, 189, 248, 0.3);
@@ -859,12 +865,12 @@ select.error-field {
     padding: 10px 20px;
   }
 
-  /* 배너: 이미지 비율 유지하며 전체 표시 (잘림 없음) */
+  /* 배너: object-fit 완전 해제 → 이미지 원본 비율 그대로 표시 */
   .banner-img {
-    height: auto;
-    max-height: 360px;
-    object-fit: contain;
-    background: var(--surface2);
+    height: auto !important;
+    max-height: none !important;
+    object-fit: initial !important;
+    object-position: initial !important;
   }
 
   /* 텍스트 배너 높이 축소 */
