@@ -1,12 +1,23 @@
 /* ============================================================
    SBS 아카데미 게임학원 · 문의 페이지
-   banner.js — 배너 슬라이더 (banner-config.js 연동)
+   banner.js — 배너 슬라이더 (이미지 자동 감지)
+
+   [배너 추가 방법]
+   PC    이미지: assets/images/banners/pc/PC01.jpg (PC02, PC03 ...)
+   모바일 이미지: assets/images/banners/mobile/M01.jpg (M02, M03 ...)
+   - 지원 확장자: jpg, jpeg, png, webp
+   - 번호 순서대로 표시되며, 번호가 끊기면 그 앞까지만 표시
+   - 모바일 이미지가 없으면 PC 이미지로 자동 대체
    ============================================================ */
 
-const SLIDE_INTERVAL = 4500; // 4.5초마다 자동 전환
-const CIRCUMFERENCE  = 2 * Math.PI * 15; // SVG ring r=15 기준 원둘레 (≈94.25)
+const SLIDE_INTERVAL = 4500;
+const CIRCUMFERENCE  = 2 * Math.PI * 15;
+const MAX_BANNERS    = 20;   // 탐색할 최대 배너 수
+const EXTENSIONS     = ['jpg', 'jpeg', 'png', 'webp'];
+const PC_BASE        = 'assets/images/banners/pc/PC';
+const MOBILE_BASE    = 'assets/images/banners/mobile/M';
 
-// BANNER_CONFIG 미설정 또는 비어있을 때 표시할 데모 배너
+// 이미지가 없을 때 표시할 데모 배너
 const DEMO_BANNERS = [
   { text: '🎮 게임 · 웹툰 · 일러스트 전문학원', sub: 'SBS 아카데미게임학원' },
   { text: '📚 게임그래픽 · 게임기획 · 게임프로그래밍', sub: '취미 · 입시 · 취업 전 과정 개설' },
@@ -18,27 +29,53 @@ let currentIndex = 0;
 let totalSlides  = 0;
 let isPaused     = false;
 
+// ── 파일 존재 여부 확인 (HEAD 요청) ──────────────────
+async function fileExists(url) {
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+// basePath + 번호(2자리) + 확장자 조합으로 실제 파일 탐색
+// 예: 'assets/images/banners/pc/PC', 1 → 'assets/images/banners/pc/PC01.jpg'
+async function findFile(basePath, index) {
+  const num = String(index).padStart(2, '0');
+  for (const ext of EXTENSIONS) {
+    const url = `${basePath}${num}.${ext}`;
+    if (await fileExists(url)) return url;
+  }
+  return null;
+}
+
+// ── 배너 목록 자동 감지 ───────────────────────────────
+async function detectBanners() {
+  const banners = [];
+  for (let i = 1; i <= MAX_BANNERS; i++) {
+    const pcUrl = await findFile(PC_BASE, i);
+    if (!pcUrl) break; // 번호 순서가 끊기면 여기서 중단
+    const mobileUrl = await findFile(MOBILE_BASE, i) || '';
+    banners.push({
+      imageUrl:       pcUrl,
+      mobileImageUrl: mobileUrl,
+      linkUrl:        '#',
+      memo:           `배너 ${i}`,
+    });
+  }
+  return banners;
+}
+
 // ── 초기화 ────────────────────────────────────────────
 async function initBannerSlider() {
   const slider = document.getElementById('banner-slider');
   if (!slider) return;
 
-  // BANNER_CONFIG에서 show:true 항목만 필터
-  const configList = (typeof BANNER_CONFIG !== 'undefined' && Array.isArray(BANNER_CONFIG))
-    ? BANNER_CONFIG.filter(b => b.show !== false && b.pc)
-    : [];
+  let banners = await detectBanners();
+  let isDemo  = false;
 
-  let banners;
-  let isDemo = false;
-
-  if (configList.length > 0) {
-    banners = configList.map(b => ({
-      imageUrl:       b.pc,
-      mobileImageUrl: b.mobile || '',
-      linkUrl:        b.link   || '#',
-      memo:           b.memo   || '',
-    }));
-  } else {
+  if (banners.length === 0) {
     banners = DEMO_BANNERS;
     isDemo  = true;
   }
@@ -72,7 +109,6 @@ function renderSlides(slider, banners, isDemo) {
 
     if (!isDemo && banner.imageUrl) {
       const img = document.createElement('img');
-      // 모바일(500px 이하)이고 모바일 전용 이미지가 있으면 사용, 없으면 PC 이미지로 대체
       const useMobile = window.innerWidth <= 500 && banner.mobileImageUrl;
       img.src       = useMobile ? banner.mobileImageUrl : banner.imageUrl;
       img.alt       = banner.memo || `배너 ${i + 1}`;
@@ -81,7 +117,7 @@ function renderSlides(slider, banners, isDemo) {
       img.addEventListener('error', () => {
         slide.classList.add('banner-slide--text');
         img.remove();
-        link.appendChild(buildTextContent('이미지를 불러올 수 없습니다', banner.memo || ''));
+        link.appendChild(buildTextContent('이미지를 불러올 수 없습니다', ''));
       });
       link.appendChild(img);
     } else {
@@ -130,38 +166,32 @@ function renderControls(total) {
   ctrl.id        = 'banner-controls';
   ctrl.className = 'banner-controls';
   ctrl.innerHTML = `
-    <!-- 일시정지/재생 버튼 (원형 progress ring 포함) -->
     <button type="button" class="bctrl-btn bctrl-play" id="bctrl-play" aria-label="일시정지">
       <svg class="ring-svg" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
         <circle class="ring-track" cx="18" cy="18" r="15"/>
         <circle class="ring-fill"  cx="18" cy="18" r="15" id="ring-fill"/>
       </svg>
-      <!-- 일시정지 아이콘 (기본 표시) -->
       <svg class="bctrl-icon icon-pause" viewBox="0 0 24 24" fill="currentColor">
         <rect x="6"  y="5" width="4" height="14" rx="1"/>
         <rect x="14" y="5" width="4" height="14" rx="1"/>
       </svg>
-      <!-- 재생 아이콘 (일시정지 상태일 때 표시) -->
       <svg class="bctrl-icon icon-play" viewBox="0 0 24 24" fill="currentColor">
         <polygon points="7,4 20,12 7,20"/>
       </svg>
     </button>
 
-    <!-- 이전 버튼 -->
     <button type="button" class="bctrl-btn" id="bctrl-prev" aria-label="이전 배너">
       <svg class="bctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15,18 9,12 15,6"/>
       </svg>
     </button>
 
-    <!-- 다음 버튼 -->
     <button type="button" class="bctrl-btn" id="bctrl-next" aria-label="다음 배너">
       <svg class="bctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9,18 15,12 9,6"/>
       </svg>
     </button>
 
-    <!-- 카운터: 현재|전체 -->
     <span class="bctrl-counter">
       <span id="bctrl-cur">1</span>
       <span class="bctrl-sep">|</span>
@@ -171,7 +201,6 @@ function renderControls(total) {
 
   document.getElementById('banner-slider').appendChild(ctrl);
 
-  // 이벤트 연결
   document.getElementById('bctrl-play').addEventListener('click', togglePlayPause);
   document.getElementById('bctrl-prev').addEventListener('click', () => {
     goToSlide(currentIndex - 1);
@@ -182,7 +211,6 @@ function renderControls(total) {
     if (!isPaused) startAutoSlide();
   });
 
-  // 초기 ring 스타일 적용
   applyRingStyle();
 }
 
@@ -202,7 +230,6 @@ function goToSlide(index) {
 
   updateCounter(currentIndex + 1, totalSlides);
 
-  // 재생 중이면 ring 처음부터 재시작
   if (!isPaused) restartRing();
 }
 
@@ -224,7 +251,7 @@ function togglePlayPause() {
 
   if (isPaused) {
     stopTimer();
-    clearRing(); // 일시정지 시 ring을 완전히 비움
+    clearRing();
     if (iconPause) iconPause.style.display = 'none';
     if (iconPlay)  iconPlay.style.display  = 'block';
     btn?.setAttribute('aria-label', '재생');
@@ -254,7 +281,6 @@ function stopTimer() {
 function applyRingStyle() {
   const fill = document.getElementById('ring-fill');
   if (!fill) return;
-  // strokeDasharray/offset만 설정 — 회전은 CSS .ring-svg { rotate(-90deg) }가 담당
   fill.style.strokeDasharray  = CIRCUMFERENCE;
   fill.style.strokeDashoffset = CIRCUMFERENCE;
 }
@@ -262,20 +288,17 @@ function applyRingStyle() {
 function restartRing() {
   const fill = document.getElementById('ring-fill');
   if (!fill) return;
-  // SVG 요소는 offsetWidth가 항상 0이라 reflow 트리거 불가
-  // getBoundingClientRect()로 SVG reflow 강제
   fill.style.animation        = 'none';
-  fill.style.strokeDashoffset = String(CIRCUMFERENCE); // 시작값 명시적 초기화
-  fill.getBoundingClientRect();                        // SVG reflow 강제
+  fill.style.strokeDashoffset = String(CIRCUMFERENCE);
+  fill.getBoundingClientRect();
   fill.style.animation = `ringProgress ${SLIDE_INTERVAL}ms linear forwards`;
 }
 
-// ring을 완전히 비운 상태로 초기화 (일시정지 버튼 클릭 시)
 function clearRing() {
   const fill = document.getElementById('ring-fill');
   if (!fill) return;
   fill.style.animation        = 'none';
-  fill.getBoundingClientRect(); // SVG reflow 강제
+  fill.getBoundingClientRect();
   fill.style.strokeDashoffset = String(CIRCUMFERENCE);
 }
 
