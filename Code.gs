@@ -19,6 +19,11 @@ function doPost(e) {
   try {
     const raw = JSON.parse(e.postData.contents);
 
+    // 허니팟 필드가 채워져 있으면 봇 → 조용히 성공 응답 후 저장 안 함
+    if (raw.hp_check) {
+      return buildJsonResponse({ status: "success" });
+    }
+
     // 입력값 검증 및 정제 — 통과 못하면 에러 반환
     const data = validateAndSanitize(raw);
 

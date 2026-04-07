@@ -830,12 +830,16 @@ select.error-field {
 .banner-img.loaded {
   opacity: 1;
 }
-/* 이미지 드래그·선택 방지 */
+/* 이미지 드래그·텍스트 선택 방지 (pointer-events는 유지 → 링크 클릭 정상 동작) */
 .banner-img {
   -webkit-user-drag: none;
   user-select: none;
   -webkit-user-select: none;
-  pointer-events: none; /* 클릭은 <a> 태그가 처리, 이미지 직접 상호작용 차단 */
+}
+/* 배너 영역 텍스트 선택 방지 */
+.banner-slider {
+  user-select: none;
+  -webkit-user-select: none;
 }
 .banner-slide a:hover .banner-img {
   filter: brightness(1.06);

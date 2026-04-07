@@ -98,9 +98,21 @@ function validate() {
 }
 
 /* ── 폼 제출 ── */
+const SUBMIT_COOLDOWN = 30 * 1000; // 30초 쿨다운 (스팸 연속 제출 방지)
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (isSubmitting) return; // 중복 제출 방지
+  if (isSubmitting) return;
+
+  // 허니팟 필드가 채워져 있으면 봇으로 간주 → 조용히 차단
+  if (document.getElementById('hp_check').value) return;
+
+  // 마지막 제출로부터 30초 미경과 시 차단
+  const lastSubmit = Number(localStorage.getItem('sbs_last_submit') || 0);
+  if (Date.now() - lastSubmit < SUBMIT_COOLDOWN) {
+    showToast('잠시 후 다시 시도해주세요.', 'error');
+    return;
+  }
 
   if (!validate()) {
     // 첫 번째 에러로 스크롤
@@ -128,7 +140,8 @@ form.addEventListener('submit', async (e) => {
   }
   const courses   = courseVals.join(', ');
   const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const payload   = { timestamp, name, phone, branch, age, purpose, courses };
+  const payload   = { timestamp, name, phone, branch, age, purpose, courses,
+                      hp_check: document.getElementById('hp_check').value };
 
   try {
     if (SHEET_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL") {
@@ -145,6 +158,7 @@ form.addEventListener('submit', async (e) => {
       });
       showToast('✅ 문의가 성공적으로 접수되었습니다!');
     }
+    localStorage.setItem('sbs_last_submit', String(Date.now())); // 쿨다운 기록
     // 폼 초기화
     form.reset();
     document.getElementById('consent-card').classList.remove('agreed');

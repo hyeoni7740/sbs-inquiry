@@ -113,6 +113,9 @@ function renderSlides(slider, banners, isDemo) {
     link.target = isExternalLink ? '_blank' : '_self';
     link.rel    = 'noopener noreferrer';
     link.setAttribute('aria-label', banner.memo || banner.text || `배너 ${i + 1}`);
+    // 우클릭 저장 · 드래그 방지 — <img>가 아닌 <a>에 등록해야 pointer-events 영향 없음
+    link.addEventListener('contextmenu', e => e.preventDefault());
+    link.addEventListener('dragstart',   e => e.preventDefault());
 
     if (!isDemo && banner.imageUrl) {
       const img = document.createElement('img');
@@ -120,10 +123,7 @@ function renderSlides(slider, banners, isDemo) {
       img.src       = useMobile ? banner.mobileImageUrl : banner.imageUrl;
       img.alt       = banner.memo || `배너 ${i + 1}`;
       img.className = 'banner-img';
-      // 이미지 우클릭 저장 · 드래그 방지
       img.setAttribute('draggable', 'false');
-      img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('dragstart',   e => e.preventDefault());
       img.addEventListener('load',  () => img.classList.add('loaded'));
       img.addEventListener('error', () => {
         slide.classList.add('banner-slide--text');
