@@ -81,8 +81,10 @@ function renderSlides(slider, banners, isDemo) {
     link.setAttribute('aria-label', banner.memo || banner.text || `배너 ${i + 1}`);
 
     if (!isDemo && banner.imageUrl) {
-      const img     = document.createElement('img');
-      img.src       = resolveImageUrl(banner.imageUrl);
+      const img = document.createElement('img');
+      // 모바일(500px 이하)이고 모바일 전용 이미지가 있으면 사용, 없으면 PC 이미지로 대체
+      const useMobile = window.innerWidth <= 500 && banner.mobileImageUrl;
+      img.src = resolveImageUrl(useMobile ? banner.mobileImageUrl : banner.imageUrl);
       img.alt       = banner.memo || `배너 ${i + 1}`;
       img.className = 'banner-img';
       img.addEventListener('load',  () => img.classList.add('loaded'));

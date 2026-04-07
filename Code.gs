@@ -32,6 +32,10 @@ function doPost(e) {
       data.courses  || "",
     ]);
 
+    // 방금 입력된 행 전체 중앙 정렬
+    const lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow, 1, 1, 7).setHorizontalAlignment("center");
+
     return buildJsonResponse({ status: "success" });
 
   } catch (err) {
@@ -52,14 +56,16 @@ function doGet(e) {
       return buildJsonResponse({ banners: [] });
     }
 
-    const rows    = sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getValues();
+    // 컬럼 구조: A=PC이미지URL, B=클릭링크, C=표시여부(Y/N), D=설명, E=모바일이미지URL
+    const rows    = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getValues();
     const banners = rows
       // 이미지URL이 있고 표시여부가 Y인 행만 필터
       .filter(row => row[0] && String(row[2]).trim().toUpperCase() === 'Y')
       .map(row => ({
-        imageUrl: String(row[0]).trim(),
-        linkUrl:  String(row[1]).trim(),
-        memo:     String(row[3]).trim(),
+        imageUrl:       String(row[0]).trim(),
+        linkUrl:        String(row[1]).trim(),
+        memo:           String(row[3]).trim(),
+        mobileImageUrl: String(row[4]).trim(), // 모바일 전용 이미지 (없으면 PC 이미지 사용)
       }));
 
     return buildJsonResponse({ banners });

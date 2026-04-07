@@ -816,6 +816,13 @@ select.error-field {
   filter: brightness(1.06);
 }
 
+/* 모바일: 750×400 이미지 기준 (표시 375×200) */
+@media (max-width: 500px) {
+  .banner-img {
+    height: 200px;
+  }
+}
+
 /* 텍스트 배너 (데모 or 이미지 없을 때) */
 .banner-slide--text a {
   display: flex;
