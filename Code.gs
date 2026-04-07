@@ -5,27 +5,33 @@
 
 const SHEET_NAME = "문의접수";
 
-// 허용 목록 — 클라이언트가 보내는 값과 정확히 일치해야 저장됨
-const ALLOWED_AGE     = ["10대", "20대", "30대", "40대이상"];
-const ALLOWED_PURPOSE = ["취미", "입시", "취업", "기타"];
-const ALLOWED_BRANCH  = [
-  "노원", "강남/신논현", "신촌/홍대", "인천", "수원/동탄",
-  "분당", "일산", "안산", "안양", "부산", "대구", "울산",
-  "대전", "천안/아산", "광주", "청주",
-];
-
 // ── 문의 접수 (POST) ──────────────────────────────────
 function doPost(e) {
   try {
     const raw = JSON.parse(e.postData.contents);
 
-    // 허니팟 필드가 채워져 있으면 봇 → 조용히 성공 응답 후 저장 안 함
+    // 허니팟 필드가 채워져 있으면 봇 → 조용히 성공 응답만 반환
     if (raw.hp_check) {
       return buildJsonResponse({ status: "success" });
     }
 
-    // 입력값 검증 및 정제 — 통과 못하면 에러 반환
-    const data = validateAndSanitize(raw);
+    // HTML 태그 제거 (스크립트 주입 방지)
+    function clean(val, maxLen) {
+      if (typeof val !== 'string') return '';
+      return val.replace(/<[^>]*>/g, '').trim().slice(0, maxLen);
+    }
+
+    const name    = clean(raw.name,    50);
+    const phone   = clean(raw.phone,   20);
+    const age     = clean(raw.age,     20);
+    const purpose = clean(raw.purpose, 20);
+    const branch  = clean(raw.branch,  30);
+    const courses = clean(raw.courses, 500);
+
+    // 필수 필드 빈값 체크
+    if (!name || !phone || !branch || !courses) {
+      throw new Error("필수 입력값 누락");
+    }
 
     const ss    = SpreadsheetApp.getActiveSpreadsheet();
     let sheet   = ss.getSheetByName(SHEET_NAME);
@@ -39,13 +45,8 @@ function doPost(e) {
     }
 
     sheet.appendRow([
-      new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }), // 서버 시각 사용 (클라이언트 위조 방지)
-      data.name,
-      data.phone,
-      data.age,
-      data.purpose,
-      data.branch,
-      data.courses,
+      new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+      name, phone, age, purpose, branch, courses,
     ]);
 
     // 방금 입력된 행 전체 중앙 정렬
@@ -53,62 +54,14 @@ function doPost(e) {
     sheet.getRange(lastRow, 1, 1, 7).setHorizontalAlignment("center");
 
     // 새 문의 접수 시 이메일 알림 발송
-    sendNotificationEmail(data);
+    sendNotificationEmail({ name, phone, age, purpose, branch, courses });
 
     return buildJsonResponse({ status: "success" });
 
   } catch (err) {
-    // 에러 내용을 외부에 노출하지 않음 (내부 로그만 남김)
     console.error("[doPost error]", err.message);
     return buildJsonResponse({ status: "error", message: "접수 처리 중 오류가 발생했습니다." });
   }
-}
-
-// ── 입력값 검증 + 정제 ────────────────────────────────
-function validateAndSanitize(raw) {
-  // HTML 태그 및 특수문자 제거 (XSS/스크립트 주입 방지)
-  function clean(val, maxLen) {
-    if (typeof val !== 'string') return '';
-    return val.replace(/<[^>]*>/g, '')   // HTML 태그 제거
-              .replace(/[<>"'`]/g, '')   // 위험 특수문자 제거
-              .trim()
-              .slice(0, maxLen);
-  }
-
-  const name    = clean(raw.name,    20);
-  const phone   = clean(raw.phone,   13);
-  const age     = clean(raw.age,     10);
-  const purpose = clean(raw.purpose, 10);
-  const branch  = clean(raw.branch,  20);
-  const courses = clean(raw.courses, 300);
-
-  // 필수 필드 빈값 체크
-  if (!name || !phone || !age || !purpose || !branch || !courses) {
-    throw new Error("필수 입력값 누락");
-  }
-
-  // 전화번호 형식 검증 (010-XXXX-XXXX)
-  if (!/^010-\d{4}-\d{4}$/.test(phone)) {
-    throw new Error("전화번호 형식 오류");
-  }
-
-  // 이름: 한글/영문/공백만 허용
-  if (!/^[가-힣a-zA-Z\s]{1,20}$/.test(name)) {
-    throw new Error("이름 형식 오류");
-  }
-
-  // 드롭다운 값 허용 목록 검증 (임의 값 주입 방지)
-  if (!ALLOWED_AGE.includes(age)) {
-    throw new Error("나이 값 오류");
-  }
-  if (!ALLOWED_PURPOSE.includes(purpose)) {
-    throw new Error("수강목적 값 오류");
-  }
-  if (!ALLOWED_BRANCH.includes(branch)) {
-    throw new Error("지점 값 오류");
-  }
-
-  return { name, phone, age, purpose, branch, courses };
 }
 
 // ── 문의 접수 알림 이메일 발송 ────────────────────────
@@ -133,7 +86,6 @@ function sendNotificationEmail(data) {
 
     MailApp.sendEmail(NOTIFY_EMAIL, subject, body);
   } catch (err) {
-    // 이메일 발송 실패해도 문의 접수는 정상 처리
     console.error("[sendNotificationEmail error]", err.message);
   }
 }
