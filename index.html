@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SBS 아카데미 게임학원 · 노원지점</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- 스타일시트 -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="wrapper">
+
+  <!-- ── 헤더 ── -->
+  <header>
+    <div class="logo-wrap">
+      <img
+        class="logo-img"
+        src="assets/images/logo.png"
+        alt="SBS 아카데미게임학원"
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';"
+      />
+      <span id="logo-fallback" class="logo-fallback">SBS 아카데미게임학원</span>
+    </div>
+
+    <div class="live-badge">접수 중</div>
+    <h1>노원지점 문의</h1>
+    <p class="subtitle">Nowon Branch · Inquiry Form</p>
+
+    <div class="phone-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.3 2 2 0 0 1 3.6 1.1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      02-6229-7740
+    </div>
+    <p class="hours">주말 · 공휴일 상담 및 접수 가능합니다</p>
+  </header>
+
+  <!-- ── 배너 슬라이더 (Google Sheets "배너" 탭에서 관리) ── -->
+  <div class="banner-slider" id="banner-slider">
+    <div class="banner-track" id="banner-track"></div>
+    <div class="banner-dots" id="banner-dots"></div>
+  </div>
+
+  <div class="divider">수강 신청 정보</div>
+
+  <form id="inquiry-form" novalidate>
+
+    <!-- ── 기본 정보 ── -->
+    <div class="card">
+      <div class="form-grid">
+        <div class="field">
+          <label>성함 <span class="req">*</span></label>
+          <input type="text" id="name" name="name" placeholder="홍길동" autocomplete="off"/>
+          <span class="field-error" id="err-name">이름을 입력해주세요</span>
+        </div>
+        <div class="field">
+          <label>연락처 <span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" maxlength="13" autocomplete="off"/>
+          <span class="field-error" id="err-phone">010-XXXX-XXXX 형식으로 입력해주세요</span>
+        </div>
+        <div class="field">
+          <label>나이 <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="age" name="age" class="placeholder-active">
+              <option value="">선택해주세요</option>
+              <option value="10대">10대</option>
+              <option value="20대">20대</option>
+              <option value="30대">30대</option>
+              <option value="40대이상">40대이상</option>
+            </select>
+          </div>
+          <span class="field-error" id="err-age">나이를 선택해주세요</span>
+        </div>
+        <div class="field">
+          <label>수강목적 <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="purpose" name="purpose" class="placeholder-active">
+              <option value="">선택해주세요</option>
+              <option value="취미">취미</option>
+              <option value="입시">입시</option>
+              <option value="취업">취업</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+          <span class="field-error" id="err-purpose">수강목적을 선택해주세요</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 과목 선택 ── -->
+    <div class="card course-card">
+      <p class="section-label">문의 과목 선택 <span>(복수 선택 가능 · 최소 1개)</span></p>
+      <div class="course-error" id="err-course">과목을 최소 1개 이상 선택해주세요</div>
+
+      <div class="course-group">
+        <div class="group-title">🎮 게임</div>
+        <div class="chips">
+          <input class="chip-input" type="checkbox" name="course" id="c1" value="디지털드로잉">
+          <label class="chip-label" for="c1">디지털드로잉</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c2" value="게임그래픽3D(캐릭터/배경)">
+          <label class="chip-label" for="c2">게임그래픽3D(캐릭터/배경)</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c3" value="게임원화">
+          <label class="chip-label" for="c3">게임원화</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c4" value="게임기획">
+          <label class="chip-label" for="c4">게임기획</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c5" value="게임프로그래밍">
+          <label class="chip-label" for="c5">게임프로그래밍</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c6" value="게임QA">
+          <label class="chip-label" for="c6">게임QA</label>
+        </div>
+      </div>
+
+      <div class="course-group">
+        <div class="group-title">✏️ 창작 · 콘텐츠</div>
+        <div class="chips">
+          <input class="chip-input" type="checkbox" name="course" id="c7" value="웹툰/만화/PD">
+          <label class="chip-label" for="c7">웹툰 / 만화 / PD</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c8" value="웹소설/PD">
+          <label class="chip-label" for="c8">웹소설 / PD</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c9" value="일러스트">
+          <label class="chip-label" for="c9">일러스트</label>
+
+          <input class="chip-input" type="checkbox" name="course" id="c10" value="AI드로잉">
+          <label class="chip-label" for="c10">AI드로잉</label>
+        </div>
+      </div>
+
+      <div class="course-group">
+        <div class="group-title">📝 기타</div>
+        <div class="chips">
+          <div class="other-row">
+            <input class="chip-input" type="checkbox" name="course" id="chip-other" value="기타">
+            <label class="chip-label" for="chip-other">기타</label>
+            <input type="text" id="other-text" name="other-course" placeholder="관심 있는 과목을 입력해주세요" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 개인정보 동의 ── -->
+    <div class="consent-card" id="consent-card">
+      <div class="consent-body">
+        <p><strong>수집목적</strong>&nbsp;&nbsp;이름 · 연락처 · 수강안내 관련이력</p>
+        <p><strong>이용목적</strong>&nbsp;&nbsp;수강안내 제공, 관련이력 관리 및 맞춤형 재안내를 통한 서비스 품질 개선</p>
+        <p><strong>보유기간</strong>&nbsp;&nbsp;수집일로부터 최대 3년간 보관 후 파기</p>
+      </div>
+      <input type="checkbox" id="consent-input" />
+      <label class="consent-check-row" for="consent-input">
+        <span class="custom-cb">
+          <svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3"/></svg>
+        </span>
+        <span class="consent-text">
+          개인정보 수집 및 이용에 <em>동의합니다</em>
+          <span class="required-mark">&nbsp;(필수)</span>
+        </span>
+      </label>
+      <div class="consent-error" id="err-consent">개인정보 수집 및 이용에 동의해주세요</div>
+    </div>
+
+    <!-- ── 제출 버튼 ── -->
+    <div class="submit-wrap">
+      <button type="submit" class="submit-btn" id="submit-btn">
+        <span class="btn-text">문의 제출하기</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 자바스크립트 -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/banner.js"></script>
+</body>
+</html>
