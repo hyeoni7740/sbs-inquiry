@@ -10,9 +10,9 @@
 // 배너 개수보다 링크가 적으면 남은 배너는 자동으로 '#' 처리됩니다.
 
 const BANNER_LINKS = [
-  'https://academy.sbs.co.kr',  // 1번 배너 클릭 시 이동할 주소
-  'https://academy.sbs.co.kr',  // 2번
-  'https://academy.sbs.co.kr',  // 3번
-  'https://academy.sbs.co.kr',  // 4번
+  'http://sbs-nowonwebtoon.co.kr/landing/before-after.asp',  // 1번 배너 클릭 시 이동할 주소
+  'http://sbs-gamekorea.com/2025/event/event2301_is.asp',  // 2번
+  'http://sbs-nowonwebtoon.co.kr/curri/curri_wrt.asp',  // 3번
+  'http://sbs-gamekorea.com/2025/landing/startup-class.asp',  // 4번
   // 배너를 추가하면 아래에 계속 입력하세요
 ];
