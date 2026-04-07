@@ -3,8 +3,7 @@
 //  Google Apps Script (Code.gs)
 // ══════════════════════════════════════════════════════
 
-const SHEET_NAME        = "문의접수";
-const BANNER_SHEET_NAME = "배너";
+const SHEET_NAME = "문의접수";
 
 // ── 문의 접수 (POST) ──────────────────────────────────
 function doPost(e) {
@@ -46,38 +45,6 @@ function doPost(e) {
   }
 }
 
-// ── 배너 데이터 반환 (GET) ────────────────────────────
-// 구글 시트 "배너" 탭에서 표시여부가 Y인 행만 반환
-// 컬럼 구조: A=이미지URL, B=클릭링크, C=표시여부(Y/N), D=설명(메모)
-function doGet(e) {
-  try {
-    const ss    = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName(BANNER_SHEET_NAME);
-
-    // "배너" 시트가 없거나 데이터가 없으면 빈 배열 반환
-    if (!sheet || sheet.getLastRow() < 2) {
-      return buildJsonResponse({ banners: [] });
-    }
-
-    // 컬럼 구조: A=PC이미지URL, B=클릭링크, C=표시여부(Y/N), D=설명, E=모바일이미지URL
-    const rows    = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getValues();
-    const banners = rows
-      // 이미지URL이 있고 표시여부가 Y인 행만 필터
-      .filter(row => row[0] && String(row[2]).trim().toUpperCase() === 'Y')
-      .map(row => ({
-        imageUrl:       String(row[0]).trim(),
-        linkUrl:        String(row[1]).trim(),
-        memo:           String(row[3]).trim(),
-        mobileImageUrl: String(row[4]).trim(), // 모바일 전용 이미지 (없으면 PC 이미지 사용)
-      }));
-
-    return buildJsonResponse({ banners });
-
-  } catch (err) {
-    return buildJsonResponse({ banners: [], error: err.message });
-  }
-}
-
 // ── 문의 접수 알림 이메일 발송 ────────────────────────
 // 알림 받을 이메일 주소를 아래에 입력하세요
 const NOTIFY_EMAIL = "hyeon_6166@naver.com";
@@ -104,13 +71,6 @@ function sendNotificationEmail(data) {
   } catch (err) {
     // 이메일 발송 실패해도 문의 접수는 정상 처리
   }
-}
-
-// ── 워밍업 함수 (트리거로 5분마다 실행 → 콜드 스타트 방지) ──
-// Apps Script 편집기 → 왼쪽 시계 아이콘(트리거) → 트리거 추가
-// 함수: warmup / 이벤트: 시간 기반 / 5분마다
-function warmup() {
-  SpreadsheetApp.getActiveSpreadsheet(); // 스프레드시트 접속으로 서버 유지
 }
 
 // ── 공통: JSON 응답 빌더 ──────────────────────────────

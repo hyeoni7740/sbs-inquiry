@@ -1,80 +1,44 @@
 /* ============================================================
-   SBS 아카데미 게임학원 · 노원지점 문의 페이지
-   banner.js — 배너 슬라이더 (Google Sheets 연동)
+   SBS 아카데미 게임학원 · 문의 페이지
+   banner.js — 배너 슬라이더 (banner-config.js 연동)
    ============================================================ */
 
 const SLIDE_INTERVAL = 4500; // 4.5초마다 자동 전환
 const CIRCUMFERENCE  = 2 * Math.PI * 15; // SVG ring r=15 기준 원둘레 (≈94.25)
 
-// SHEET_URL 미설정 시 화면에 표시할 데모 배너
+// BANNER_CONFIG 미설정 또는 비어있을 때 표시할 데모 배너
 const DEMO_BANNERS = [
-  { imageUrl: '', linkUrl: '#', text: '🎮 게임 · 웹툰 · 일러스트 전문학원', sub: 'SBS 아카데미게임학원 노원지점' },
-  { imageUrl: '', linkUrl: '#', text: '📚 게임그래픽 · 게임기획 · 게임프로그래밍', sub: '취미 · 입시 · 취업 전 과정 개설' },
-  { imageUrl: '', linkUrl: '#', text: '☎️ 02-6229-7740', sub: '주말 · 공휴일 상담 및 접수 가능' },
+  { text: '🎮 게임 · 웹툰 · 일러스트 전문학원', sub: 'SBS 아카데미게임학원' },
+  { text: '📚 게임그래픽 · 게임기획 · 게임프로그래밍', sub: '취미 · 입시 · 취업 전 과정 개설' },
+  { text: '☎️ 02-6229-7740', sub: '주말 · 공휴일 상담 및 접수 가능' },
 ];
 
 let slideTimer   = null;
 let currentIndex = 0;
 let totalSlides  = 0;
-let isPaused     = false; // 사용자가 수동으로 일시정지한 상태
-
-// ── 배너 데이터 로드 (localStorage 캐시 우선) ─────────
-const CACHE_KEY = 'sbs_banners';
-const CACHE_TTL = 10 * 60 * 1000; // 10분
-
-async function loadBanners() {
-  // 1) 캐시 확인 → 유효하면 즉시 반환 (빠름)
-  try {
-    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-    if (cached && Date.now() - cached.ts < CACHE_TTL && cached.data.length > 0) {
-      // 백그라운드에서 조용히 갱신 (다음 방문에 반영)
-      fetchAndCache().catch(() => {});
-      return cached.data;
-    }
-  } catch (_) {}
-
-  // 2) 캐시 없거나 만료 → API 직접 호출
-  return fetchAndCache();
-}
-
-async function fetchAndCache() {
-  try {
-    const res  = await fetch(SHEET_URL, { method: 'GET' });
-    const data = await res.json();
-    const list = Array.isArray(data.banners) ? data.banners : [];
-    if (list.length > 0) {
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: list }));
-    }
-    return list;
-  } catch (err) {
-    console.error('[banner] 배너 로드 실패:', err);
-    return [];
-  }
-}
-
-// ── Google Drive URL 변환 ─────────────────────────────
-// 공유 링크 형식: https://drive.google.com/file/d/파일ID/view?...
-// → thumbnail URL: https://drive.google.com/thumbnail?id=파일ID&sz=w1200
-function resolveImageUrl(url) {
-  if (!url) return '';
-  const match = url.match(/\/file\/d\/([^/]+)/);
-  if (match) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200`;
-  return url;
-}
+let isPaused     = false;
 
 // ── 초기화 ────────────────────────────────────────────
 async function initBannerSlider() {
   const slider = document.getElementById('banner-slider');
   if (!slider) return;
 
-  let banners = [];
-  let isDemo  = false;
+  // BANNER_CONFIG에서 show:true 항목만 필터
+  const configList = (typeof BANNER_CONFIG !== 'undefined' && Array.isArray(BANNER_CONFIG))
+    ? BANNER_CONFIG.filter(b => b.show !== false && b.pc)
+    : [];
 
-  if (typeof SHEET_URL !== 'undefined' && SHEET_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL') {
-    banners = await loadBanners();
-  }
+  let banners;
+  let isDemo = false;
 
-  if (banners.length === 0) {
+  if (configList.length > 0) {
+    banners = configList.map(b => ({
+      imageUrl:       b.pc,
+      mobileImageUrl: b.mobile || '',
+      linkUrl:        b.link   || '#',
+      memo:           b.memo   || '',
+    }));
+  } else {
     banners = DEMO_BANNERS;
     isDemo  = true;
   }
@@ -110,7 +74,7 @@ function renderSlides(slider, banners, isDemo) {
       const img = document.createElement('img');
       // 모바일(500px 이하)이고 모바일 전용 이미지가 있으면 사용, 없으면 PC 이미지로 대체
       const useMobile = window.innerWidth <= 500 && banner.mobileImageUrl;
-      img.src = resolveImageUrl(useMobile ? banner.mobileImageUrl : banner.imageUrl);
+      img.src       = useMobile ? banner.mobileImageUrl : banner.imageUrl;
       img.alt       = banner.memo || `배너 ${i + 1}`;
       img.className = 'banner-img';
       img.addEventListener('load',  () => img.classList.add('loaded'));
@@ -291,7 +255,6 @@ function applyRingStyle() {
   const fill = document.getElementById('ring-fill');
   if (!fill) return;
   // strokeDasharray/offset만 설정 — 회전은 CSS .ring-svg { rotate(-90deg) }가 담당
-  // fill에 별도 transform 적용하면 SVG 회전과 중첩되어 6시 방향에서 시작하는 버그 발생
   fill.style.strokeDasharray  = CIRCUMFERENCE;
   fill.style.strokeDashoffset = CIRCUMFERENCE;
 }
@@ -305,11 +268,6 @@ function restartRing() {
   fill.style.strokeDashoffset = String(CIRCUMFERENCE); // 시작값 명시적 초기화
   fill.getBoundingClientRect();                        // SVG reflow 강제
   fill.style.animation = `ringProgress ${SLIDE_INTERVAL}ms linear forwards`;
-}
-
-function pauseRing() {
-  const fill = document.getElementById('ring-fill');
-  if (fill) fill.style.animationPlayState = 'paused';
 }
 
 // ring을 완전히 비운 상태로 초기화 (일시정지 버튼 클릭 시)
