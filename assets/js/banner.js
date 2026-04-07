@@ -50,21 +50,24 @@ async function findFile(basePath, index) {
   return null;
 }
 
-// ── 배너 목록 자동 감지 ───────────────────────────────
+// ── 배너 목록 자동 감지 (번호 중간 공백 허용) ──────────
+// 모든 번호를 병렬로 확인 → 존재하는 것만 번호 오름차순으로 표시
 async function detectBanners() {
-  const banners = [];
-  for (let i = 1; i <= MAX_BANNERS; i++) {
+  const checks = Array.from({ length: MAX_BANNERS }, (_, i) => i + 1).map(async (i) => {
     const pcUrl = await findFile(PC_BASE, i);
-    if (!pcUrl) break; // 번호 순서가 끊기면 여기서 중단
+    if (!pcUrl) return null; // 해당 번호 없으면 스킵 (중간 공백 허용)
     const mobileUrl = await findFile(MOBILE_BASE, i) || '';
-    banners.push({
+    return {
       imageUrl:       pcUrl,
       mobileImageUrl: mobileUrl,
       linkUrl:        '#',
       memo:           `배너 ${i}`,
-    });
-  }
-  return banners;
+    };
+  });
+
+  // 병렬 실행 후 null(없는 번호) 제거 → 번호 순 유지
+  const results = await Promise.all(checks);
+  return results.filter(Boolean);
 }
 
 // ── 초기화 ────────────────────────────────────────────
@@ -113,6 +116,10 @@ function renderSlides(slider, banners, isDemo) {
       img.src       = useMobile ? banner.mobileImageUrl : banner.imageUrl;
       img.alt       = banner.memo || `배너 ${i + 1}`;
       img.className = 'banner-img';
+      // 이미지 우클릭 저장 · 드래그 방지
+      img.setAttribute('draggable', 'false');
+      img.addEventListener('contextmenu', e => e.preventDefault());
+      img.addEventListener('dragstart',   e => e.preventDefault());
       img.addEventListener('load',  () => img.classList.add('loaded'));
       img.addEventListener('error', () => {
         slide.classList.add('banner-slide--text');
