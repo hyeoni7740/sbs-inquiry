@@ -346,13 +346,14 @@ label .req {
 
 input[type="text"],
 input[type="tel"] {
+  /* 16px 미만이면 iOS Safari가 터치 시 자동 확대 — 반드시 16px 이상 유지 */
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 17px;
   color: var(--text);
   font-family: "Noto Sans KR", sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
   width: 100%;
   transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
@@ -405,7 +406,7 @@ select {
   padding: 14px 40px 14px 17px;
   color: var(--text);
   font-family: "Noto Sans KR", sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
   width: 100%;
   cursor: pointer;
@@ -553,7 +554,7 @@ select.error-field {
   padding: 10px 15px;
   color: var(--text);
   font-family: "Noto Sans KR", sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.22s, box-shadow 0.22s;
   animation: expandIn 0.2s ease;
