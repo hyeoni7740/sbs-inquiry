@@ -327,8 +327,10 @@ h1 {
   gap: 9px;
 }
 /* 지점 선택처럼 전체 너비를 차지하는 필드 */
+/* form-grid 바깥에 위치하므로 grid gap(24px)과 동일한 margin-bottom 명시 */
 .field--full {
   grid-column: 1 / -1;
+  margin-bottom: 24px;
 }
 
 label {
