@@ -329,7 +329,6 @@ h1 {
 /* 지점 선택처럼 전체 너비를 차지하는 필드 */
 .field--full {
   grid-column: 1 / -1;
-  margin-bottom: 8px;
 }
 
 label {
