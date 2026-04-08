@@ -783,6 +783,10 @@ select.error-field {
   border-color: rgba(248, 113, 113, 0.45);
   color: var(--err);
 }
+.toast.info {
+  border-color: rgba(56, 189, 248, 0.45);
+  color: var(--accent);
+}
 
 /* ── 배너 슬라이더 ── */
 .banner-slider {
